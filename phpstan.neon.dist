@@ -1,0 +1,21 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - ./vendor/phpstan/phpstan-phpunit/extension.neon
+    - ./vendor/phpstan/phpstan-phpunit/rules.neon
+    - ./vendor/phpstan/phpstan-strict-rules/rules.neon
+    - ./vendor/shipmonk/phpstan-rules/rules.neon
+
+parameters:
+    level: 9
+    paths:
+        - src
+        - tests
+    tmpDir: cache/phpstan/
+    checkMissingCallableSignature: false
+    checkUninitializedProperties: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkBenevolentUnionTypes: true
+
+    shipmonkRules:
+        forbidCast:
+            enabled: false

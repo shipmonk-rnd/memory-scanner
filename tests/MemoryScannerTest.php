@@ -1,0 +1,135 @@
+<?php declare(strict_types = 1);
+
+namespace ShipMonkTests\MemoryScanner;
+
+use DateTimeImmutable;
+use ShipMonk\MemoryScanner\Exception\LogicException;
+use ShipMonk\MemoryScanner\MemoryRootsProvider;
+use ShipMonk\MemoryScanner\MemoryScanner;
+use ShipMonk\MemoryScanner\ObjectReference;
+use stdClass;
+
+class MemoryScannerTest extends MemoryScannerTestCase
+{
+
+    public function testFindRootsWithNoProviders(): void
+    {
+        $memoryScanner = new MemoryScanner();
+        self::assertSame([], $memoryScanner->findRoots());
+    }
+
+    public function testFindRoots(): void
+    {
+        $memoryRootsProviderA = $this->createMock(MemoryRootsProvider::class);
+        $memoryRootsProviderA->expects(self::once())
+            ->method('getRoots')
+            ->willReturn(['root1', 'root2']);
+
+        $memoryRootsProviderB = $this->createMock(MemoryRootsProvider::class);
+        $memoryRootsProviderB->expects(self::once())
+            ->method('getRoots')
+            ->willReturn(['root3', 'nested' => ['root4']]);
+
+        $memoryScanner = new MemoryScanner();
+        $memoryScanner->registerMemoryRootsProvider('my_provider_a', $memoryRootsProviderA);
+        $memoryScanner->registerMemoryRootsProvider('my_provider_b', $memoryRootsProviderB);
+
+        self::assertSame(
+            ['my_provider_a' => ['root1', 'root2'], 'my_provider_b' => ['root3', 'nested' => ['root4']]],
+            $memoryScanner->findRoots(),
+        );
+    }
+
+    public function testFindObjectReferencesWithNoRoots(): void
+    {
+        $memoryScanner = new MemoryScanner();
+        self::assertCount(0, $memoryScanner->findObjectReferences([]));
+    }
+
+    public function testFindObjectReferencesWithObjectCycle(): void
+    {
+        $a = (object) ['name' => 'A', 'ref' => null];
+        $b = (object) ['name' => 'B', 'ref' => $a];
+        $c = (object) ['name' => 'C', 'ref' => [$b]];
+        $a->ref = $c;
+
+        $memoryScanner = new MemoryScanner();
+        $objectReferences = $memoryScanner->findObjectReferences(['root' => $a]);
+        self::assertCount(3, $objectReferences);
+
+        self::assertEquals(
+            [new ObjectReference(null, ['root']), new ObjectReference($b, ['$ref'])],
+            $objectReferences[$a],
+        );
+
+        self::assertEquals(
+            [new ObjectReference($c, ['$ref', 0])],
+            $objectReferences[$b],
+        );
+
+        self::assertEquals(
+            [new ObjectReference($a, ['$ref'])],
+            $objectReferences[$c],
+        );
+    }
+
+    public function testFindObjectReferencesWithArrayReferenceCycle(): void
+    {
+        $a = new DateTimeImmutable();
+        $b = [&$b, 'ref' => $a]; // @phpstan-ignore variable.undefined
+        $c = (object) ['ref' => $b];
+
+        $memoryScanner = new MemoryScanner();
+        $objectReferences = $memoryScanner->findObjectReferences(['root' => $c]);
+        self::assertCount(2, $objectReferences);
+
+        self::assertEquals(
+            [new ObjectReference(null, ['root'])],
+            $objectReferences[$c],
+        );
+
+        self::assertEquals(
+            [new ObjectReference($c, ['$ref', 'ref']), new ObjectReference($c, ['$ref', 0, 'ref'])],
+            $objectReferences[$a],
+        );
+    }
+
+    public function testFindRootReference(): void
+    {
+        $a = (object) ['name' => 'A', 'ref' => null];
+        $b = (object) ['name' => 'B', 'ref' => $a];
+        $c = (object) ['name' => 'C', 'ref' => [$b]];
+        $a->ref = $c;
+
+        $memoryScanner = new MemoryScanner();
+        $objectReferences = $memoryScanner->findObjectReferences(['root' => $a]);
+
+        self::assertEquals(
+            [new ObjectReference(null, ['root'])],
+            $memoryScanner->findRootReference($a, $objectReferences),
+        );
+
+        self::assertEquals(
+            [
+                new ObjectReference(null, ['root']),
+                new ObjectReference($a, ['$ref']),
+                new ObjectReference($c, ['$ref', 0]),
+            ],
+            $memoryScanner->findRootReference($b, $objectReferences),
+        );
+
+        self::assertEquals(
+            [new ObjectReference(null, ['root']), new ObjectReference($a, ['$ref'])],
+            $memoryScanner->findRootReference($c, $objectReferences),
+        );
+
+        self::assertException(
+            LogicException::class,
+            'No root reference found for the object.',
+            static function () use ($memoryScanner, $objectReferences): void {
+                $memoryScanner->findRootReference(new stdClass(), $objectReferences);
+            },
+        );
+    }
+
+}
