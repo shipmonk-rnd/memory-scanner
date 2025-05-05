@@ -4,7 +4,6 @@ namespace ShipMonk\MemoryScanner;
 
 use ReflectionClass;
 use ReflectionReference;
-use ShipMonk\MemoryScanner\Exception\LogicException;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ClosureExporter;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ReflectionFiberExporter;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ReflectionFunctionExporter;
@@ -165,15 +164,18 @@ final class MemoryScanner
     }
 
     /**
-     * Returns the shortest object reference sequence from the root to the given object.
+     * Returns the shortest object reference sequence from the root to the given object,
+     * that does not pass though any object in the $ignoreReferencesFrom map.
      *
      * @param WeakMap<object, list<ObjectReference>> $objectReferences
-     * @return non-empty-list<ObjectReference>
+     * @param WeakMap<object, string>|null $ignoreReferencesFrom
+     * @return non-empty-list<ObjectReference>|null
      */
     public function findRootReference(
         object $object,
         WeakMap $objectReferences,
-    ): array
+        ?WeakMap $ignoreReferencesFrom = null,
+    ): ?array
     {
         $visitedObjects = [];
 
@@ -196,11 +198,15 @@ final class MemoryScanner
                     return [$objectReference, ...$referencePath];
                 }
 
+                if ($ignoreReferencesFrom !== null && isset($ignoreReferencesFrom[$objectReference->source])) {
+                    continue;
+                }
+
                 $queue->enqueue([$objectReference->source, [$objectReference, ...$referencePath]]);
             }
         }
 
-        throw new LogicException('No root reference found for the object.');
+        return null;
     }
 
     /**

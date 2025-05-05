@@ -3,7 +3,6 @@
 namespace ShipMonkTests\MemoryScanner;
 
 use DateTimeImmutable;
-use ShipMonk\MemoryScanner\Exception\LogicException;
 use ShipMonk\MemoryScanner\MemoryRootsProvider;
 use ShipMonk\MemoryScanner\MemoryScanner;
 use ShipMonk\MemoryScanner\ObjectReference;
@@ -123,13 +122,7 @@ class MemoryScannerTest extends MemoryScannerTestCase
             $memoryScanner->findRootReference($c, $objectReferences),
         );
 
-        self::assertException(
-            LogicException::class,
-            'No root reference found for the object.',
-            static function () use ($memoryScanner, $objectReferences): void {
-                $memoryScanner->findRootReference(new stdClass(), $objectReferences);
-            },
-        );
+        self::assertNull($memoryScanner->findRootReference(new stdClass(), $objectReferences));
     }
 
 }
