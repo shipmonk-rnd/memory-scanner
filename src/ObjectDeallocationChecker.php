@@ -45,7 +45,7 @@ final class ObjectDeallocationChecker
     /**
      * @return array<string, array<string, list<ObjectReference>>>
      */
-    public function checkDeallocations(): array
+    public function checkDeallocations(bool $verbose = false): array
     {
         gc_collect_cycles();
 
@@ -62,12 +62,18 @@ final class ObjectDeallocationChecker
             if (!isset($objectReferences[$trackedObject])) {
                 $root = self::UNKNOWN_ROOT;
                 $causes[$root][$label] = [];
-
-            } else {
-                $rootReference = $memoryScanner->findRootReference($trackedObject, $objectReferences);
-                $root = $rootReference[0]->path[0];
-                $causes[$root][$label] = $rootReference;
+                continue;
             }
+
+            $ignoreReferencesFrom = $verbose ? null : $this->trackedObjects;
+            $rootReference = $memoryScanner->findRootReference($trackedObject, $objectReferences, $ignoreReferencesFrom);
+
+            if ($rootReference === null) {
+                continue; // secondary leak (an object leaked only because another tracked object leaked)
+            }
+
+            $root = $rootReference[0]->path[0];
+            $causes[$root][$label] = $rootReference;
         }
 
         ksort($causes);
