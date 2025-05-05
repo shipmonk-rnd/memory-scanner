@@ -10,7 +10,13 @@ final class OutputBufferingHandlerMemoryRootsProvider implements MemoryRootsProv
 
     public function getRoots(): array
     {
-        return ob_list_handlers();
+        $roots = [];
+
+        foreach (ob_list_handlers() as $index => $autoloadFunction) {
+            $roots["output buffering handler #{$index}"] = $autoloadFunction;
+        }
+
+        return $roots;
     }
 
 }

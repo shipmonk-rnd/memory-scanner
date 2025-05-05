@@ -20,10 +20,19 @@ final class StackTraceMemoryRootsProvider implements MemoryRootsProvider
             && function_exists('xdebug_get_function_stack')
             && in_array('develop', xdebug_info('mode'), strict: true)
         ) {
-            return xdebug_get_function_stack(['local_vars' => true, 'params_as_values' => true]);
+            $frames = xdebug_get_function_stack(['local_vars' => true, 'params_as_values' => true]);
+
+        } else {
+            $frames = debug_backtrace();
         }
 
-        return debug_backtrace();
+        $roots = [];
+
+        foreach ($frames as $index => $frame) {
+            $roots["stack frame #{$index}"] = $frame;
+        }
+
+        return $roots;
     }
 
 }

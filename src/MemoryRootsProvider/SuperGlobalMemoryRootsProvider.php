@@ -10,15 +10,15 @@ final class SuperGlobalMemoryRootsProvider implements MemoryRootsProvider
     public function getRoots(): array
     {
         return [
-            '$GLOBALS' => $GLOBALS,
-            '$_POST' => $_POST,
-            '$_GET' => $_GET,
-            '$_SERVER' => $_SERVER,
-            '$_SESSION' => $_SESSION ?? null,
-            '$_ENV' => $_ENV ?? null, // @phpstan-ignore nullCoalesce.variable
-            '$_COOKIE' => $_COOKIE,
-            '$_FILES' => $_FILES,
-            '$_REQUEST' => $_REQUEST,
+            'superglobal variable $GLOBALS' => $GLOBALS,
+            'superglobal variable $_POST' => $_POST,
+            'superglobal variable $_GET' => $_GET,
+            'superglobal variable $_SERVER' => $_SERVER,
+            'superglobal variable $_SESSION' => $_SESSION ?? null,
+            'superglobal variable $_ENV' => $_ENV ?? null, // @phpstan-ignore nullCoalesce.variable
+            'superglobal variable $_COOKIE' => $_COOKIE,
+            'superglobal variable $_FILES' => $_FILES,
+            'superglobal variable $_REQUEST' => $_REQUEST,
         ];
     }
 

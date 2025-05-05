@@ -17,7 +17,7 @@ final class FunctionMemoryRootsProvider implements MemoryRootsProvider
             $functionReflection = new ReflectionFunction($functionName);
 
             foreach ($functionReflection->getStaticVariables() as $staticVariableName => $staticVariableValue) {
-                $roots[$functionName]['static'][$staticVariableName] = $staticVariableValue;
+                $roots["static variable \${$staticVariableName} inside function {$functionName}()"] = $staticVariableValue;
             }
         }
 

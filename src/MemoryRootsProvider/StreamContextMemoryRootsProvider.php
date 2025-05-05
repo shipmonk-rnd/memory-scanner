@@ -11,7 +11,13 @@ final class StreamContextMemoryRootsProvider implements MemoryRootsProvider
 
     public function getRoots(): array
     {
-        return stream_context_get_params(stream_context_get_default());
+        $roots = [];
+
+        foreach (stream_context_get_params(stream_context_get_default()) as $parameterName => $parameterValue) {
+            $roots["stream context parameter {$parameterName}"] = $parameterValue;
+        }
+
+        return $roots;
     }
 
 }

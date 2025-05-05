@@ -40,7 +40,7 @@ final class MemoryScanner
 {
 
     /**
-     * @var array<string, MemoryRootsProvider>
+     * @var list<MemoryRootsProvider>
      */
     private array $memoryRootsProvider = [];
 
@@ -60,17 +60,17 @@ final class MemoryScanner
     {
         $memoryScanner = new self();
 
-        $memoryScanner->registerMemoryRootsProvider('autoload', new AutoloadMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('classLike', new ClassLikeMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('constant', new ConstantMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('errorHandler', new ErrorHandlerMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('exceptionHandler', new ExceptionHandlerMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('function', new FunctionMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('outputBufferingHandler', new OutputBufferingHandlerMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('signalHandler', new SignalHandlerMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('stackTrace', new StackTraceMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('streamContext', new StreamContextMemoryRootsProvider());
-        $memoryScanner->registerMemoryRootsProvider('superGlobals', new SuperGlobalMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new AutoloadMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new ClassLikeMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new ConstantMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new ErrorHandlerMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new ExceptionHandlerMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new FunctionMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new OutputBufferingHandlerMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new SignalHandlerMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new StackTraceMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new StreamContextMemoryRootsProvider());
+        $memoryScanner->registerMemoryRootsProvider(new SuperGlobalMemoryRootsProvider());
 
         $memoryScanner->registerInternalObjectExporter(new ClosureExporter());
         $memoryScanner->registerInternalObjectExporter(new ReflectionFiberExporter());
@@ -80,17 +80,9 @@ final class MemoryScanner
         return $memoryScanner;
     }
 
-    public function registerMemoryRootsProvider(
-        string $key,
-        ?MemoryRootsProvider $provider,
-    ): void
+    public function registerMemoryRootsProvider(MemoryRootsProvider $provider): void
     {
-        if ($provider !== null) {
-            $this->memoryRootsProvider[$key] = $provider;
-
-        } else {
-            unset($this->memoryRootsProvider[$key]);
-        }
+        $this->memoryRootsProvider[] = $provider;
     }
 
     /**
@@ -110,8 +102,10 @@ final class MemoryScanner
     {
         $roots = [];
 
-        foreach ($this->memoryRootsProvider as $key => $provider) {
-            $roots[$key] = $provider->getRoots();
+        foreach ($this->memoryRootsProvider as $provider) {
+            foreach ($provider->getRoots() as $rootKey => $rootValue) {
+                $roots[$rootKey] = $rootValue;
+            }
         }
 
         return $roots;
@@ -174,7 +168,7 @@ final class MemoryScanner
      * Returns the shortest object reference sequence from the root to the given object.
      *
      * @param WeakMap<object, list<ObjectReference>> $objectReferences
-     * @return list<ObjectReference>
+     * @return non-empty-list<ObjectReference>
      */
     public function findRootReference(
         object $object,

@@ -3,6 +3,7 @@
 namespace ShipMonk\MemoryScanner\MemoryRootsProvider;
 
 use ShipMonk\MemoryScanner\MemoryRootsProvider;
+use function array_reverse;
 use function count;
 use function restore_exception_handler;
 use function set_exception_handler;
@@ -10,9 +11,6 @@ use function set_exception_handler;
 final class ExceptionHandlerMemoryRootsProvider implements MemoryRootsProvider
 {
 
-    /**
-     * @return list<callable>
-     */
     public function getRoots(): array
     {
         $roots = [];
@@ -24,12 +22,15 @@ final class ExceptionHandlerMemoryRootsProvider implements MemoryRootsProvider
                 break;
             }
 
-            $roots[] = $exceptionHandler;
+            $rootIndex = count($roots);
+            $roots["exception handler #{$rootIndex}"] = $exceptionHandler;
             restore_exception_handler();
         }
 
-        for ($i = count($roots) - 1; $i >= 0; $i--) {
-            set_exception_handler($roots[$i]);
+        unset($exceptionHandler);
+
+        foreach (array_reverse($roots) as $exceptionHandler) {
+            set_exception_handler($exceptionHandler);
         }
 
         return $roots;

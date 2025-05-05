@@ -10,7 +10,13 @@ final class ConstantMemoryRootsProvider implements MemoryRootsProvider
 
     public function getRoots(): array
     {
-        return get_defined_constants(categorize: true);
+        $roots = [];
+
+        foreach (get_defined_constants(categorize: true)['user'] ?? [] as $constantName => $constantValue) {
+            $roots["global constant {$constantName}"] = $constantValue;
+        }
+
+        return $roots;
     }
 
 }

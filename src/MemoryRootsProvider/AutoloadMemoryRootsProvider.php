@@ -8,12 +8,15 @@ use function spl_autoload_functions;
 final class AutoloadMemoryRootsProvider implements MemoryRootsProvider
 {
 
-    /**
-     * @return list<mixed>
-     */
     public function getRoots(): array
     {
-        return spl_autoload_functions();
+        $roots = [];
+
+        foreach (spl_autoload_functions() as $index => $autoloadFunction) {
+            $roots["autoload function #{$index}"] = $autoloadFunction;
+        }
+
+        return $roots;
     }
 
 }

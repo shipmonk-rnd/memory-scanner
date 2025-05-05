@@ -6,7 +6,7 @@ interface MemoryRootsProvider
 {
 
     /**
-     * @return array<mixed>
+     * @return array<string, mixed>
      */
     public function getRoots(): array;
 

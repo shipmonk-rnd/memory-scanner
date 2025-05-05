@@ -15,7 +15,7 @@ final class SignalHandlerMemoryRootsProvider implements MemoryRootsProvider
 
         if (extension_loaded('pcntl')) {
             for ($signalNumber = 1; $signalNumber < 32; $signalNumber++) {
-                $roots[$signalNumber] = pcntl_signal_get_handler($signalNumber);
+                $roots["signal handler for signal {$signalNumber}"] = pcntl_signal_get_handler($signalNumber);
             }
         }
 

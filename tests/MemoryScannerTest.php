@@ -23,19 +23,19 @@ class MemoryScannerTest extends MemoryScannerTestCase
         $memoryRootsProviderA = $this->createMock(MemoryRootsProvider::class);
         $memoryRootsProviderA->expects(self::once())
             ->method('getRoots')
-            ->willReturn(['root1', 'root2']);
+            ->willReturn(['root1' => 1, 'root2' => 2]);
 
         $memoryRootsProviderB = $this->createMock(MemoryRootsProvider::class);
         $memoryRootsProviderB->expects(self::once())
             ->method('getRoots')
-            ->willReturn(['root3', 'nested' => ['root4']]);
+            ->willReturn(['root3' => 3, 'nested' => ['root4' => 4]]);
 
         $memoryScanner = new MemoryScanner();
-        $memoryScanner->registerMemoryRootsProvider('my_provider_a', $memoryRootsProviderA);
-        $memoryScanner->registerMemoryRootsProvider('my_provider_b', $memoryRootsProviderB);
+        $memoryScanner->registerMemoryRootsProvider($memoryRootsProviderA);
+        $memoryScanner->registerMemoryRootsProvider($memoryRootsProviderB);
 
         self::assertSame(
-            ['my_provider_a' => ['root1', 'root2'], 'my_provider_b' => ['root3', 'nested' => ['root4']]],
+            ['root1' => 1, 'root2' => 2, 'root3' => 3, 'nested' => ['root4' => 4]],
             $memoryScanner->findRoots(),
         );
     }

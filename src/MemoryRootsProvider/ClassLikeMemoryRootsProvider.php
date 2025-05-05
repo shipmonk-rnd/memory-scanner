@@ -21,7 +21,7 @@ final class ClassLikeMemoryRootsProvider implements MemoryRootsProvider
                 if ($propertyReflection->isStatic() && $propertyReflection->isInitialized()) {
                     $propertyName = $propertyReflection->getName();
                     $propertyValue = $propertyReflection->getValue();
-                    $roots[$className]['property'][$propertyName]['value'] = $propertyValue;
+                    $roots["static property {$className}::\${$propertyName}"] = $propertyValue;
                 }
 
                 if (PHP_VERSION_ID >= 8_04_00) {
@@ -29,7 +29,7 @@ final class ClassLikeMemoryRootsProvider implements MemoryRootsProvider
                         $hookName = $hookReflection->getName(); // e.g. '$foo::get'
 
                         foreach ($hookReflection->getStaticVariables() as $staticVariableName => $staticVariableValue) {
-                            $roots[$className]['hook'][$hookName]['static'][$staticVariableName] = $staticVariableValue;
+                            $roots["static variable \${$staticVariableName} inside property hook {$className}::{$hookName}()"] = $staticVariableValue;
                         }
                     }
                 }
@@ -39,7 +39,7 @@ final class ClassLikeMemoryRootsProvider implements MemoryRootsProvider
                 $methodName = $methodReflection->getName();
 
                 foreach ($methodReflection->getStaticVariables() as $staticVariableName => $staticVariableValue) {
-                    $roots[$className]['method'][$methodName]['static'][$staticVariableName] = $staticVariableValue;
+                    $roots["static variable \${$staticVariableName} inside method {$className}::{$methodName}()"] = $staticVariableValue;
                 }
             }
         }
