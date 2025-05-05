@@ -1,0 +1,5 @@
+The following 1 objects could not be deallocated,
+because they are referenced from 'static property ShipMonkTests\MemoryScanner\ObjectDeallocationCheckerTest::$leakTest':
+  Object 'Foo' is referenced thought the following path:'
+    -> static property ShipMonkTests\MemoryScanner\ObjectDeallocationCheckerTest::$leakTest
+    -> foo

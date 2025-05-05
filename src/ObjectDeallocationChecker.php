@@ -72,7 +72,7 @@ final class ObjectDeallocationChecker
                 continue; // secondary leak (an object leaked only because another tracked object leaked)
             }
 
-            $root = $rootReference[0]->path[0];
+            $root = (string) $rootReference[0]->path[0];
             $causes[$root][$label] = $rootReference;
         }
 
@@ -100,7 +100,7 @@ final class ObjectDeallocationChecker
 
                 foreach ($objectReferences as $objectReference) {
                     if ($objectReference->source !== null) {
-                        $sourceLabel = $this->getSourceObjectLabel($objectReference);
+                        $sourceLabel = $this->getSourceObjectLabel($objectReference->source);
                         $lines[] = "    -> {{$sourceLabel}}";
                     }
 
@@ -113,17 +113,17 @@ final class ObjectDeallocationChecker
             $blocks[] = implode("\n", $lines);
         }
 
-        return implode("\n\n", $blocks);
+        return implode("\n\n", $blocks) . "\n";
     }
 
-    private function getSourceObjectLabel(ObjectReference $objectReference): string
+    private function getSourceObjectLabel(object $object): string
     {
-        if (isset($this->trackedObjects[$objectReference->source])) {
-            return $this->trackedObjects[$objectReference->source];
+        if (isset($this->trackedObjects[$object])) {
+            return $this->trackedObjects[$object];
         }
 
-        $objectId = spl_object_id($objectReference->source);
-        return 'instance of ' . $objectReference->source::class . " #{$objectId}";
+        $objectId = spl_object_id($object);
+        return 'instance of ' . $object::class . " #{$objectId}";
     }
 
 }

@@ -8,7 +8,7 @@ use ShipMonk\MemoryScanner\ObjectDeallocationChecker;
 class ObjectDeallocationCheckerTest extends MemoryScannerTestCase
 {
 
-    public static mixed $leakTest = null;
+    private static mixed $leakTest = null;
 
     public function testCheckDeallocationsOk(): void
     {
@@ -33,7 +33,7 @@ class ObjectDeallocationCheckerTest extends MemoryScannerTestCase
 
         $leaks = $objectDeallocationChecker->checkDeallocations();
         self::assertCount(1, $leaks);
-        self::assertSame('', $objectDeallocationChecker->explainLeaks($leaks));
+        self::assertSnapshot(__DIR__ . '/snapshots/ObjectDeallocationCheckerTest.testExplainLeaks.txt', $objectDeallocationChecker->explainLeaks($leaks));
     }
 
 }
