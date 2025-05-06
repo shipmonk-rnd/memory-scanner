@@ -4,6 +4,8 @@ namespace ShipMonk\MemoryScanner;
 
 use Closure;
 use WeakMap;
+use function array_map;
+use function array_sum;
 use function count;
 use function gc_collect_cycles;
 use function implode;
@@ -81,33 +83,43 @@ final class ObjectDeallocationChecker
     }
 
     /**
-     * @param array<string, array<string, list<ObjectReference>>> $leaks
+     * @param array<string, array<string, list<ObjectReference>>> $objectLeakCauses
      */
-    public function explainLeaks(array $leaks): string
+    public function explainLeaks(array $objectLeakCauses): string
     {
         $blocks = [];
 
-        foreach ($leaks as $root => $leakedObjects) {
-            $leakedObjectCount = count($leakedObjects);
+        $totalLeakedObjectCount = array_sum(array_map(count(...), $objectLeakCauses));
+        $maybePlural = $totalLeakedObjectCount > 1 ? 'objects are' : 'object is';
+        $blocks[] = "Expected all tracked objects to be deallocated, but total of {$totalLeakedObjectCount} {$maybePlural} still in memory.";
+
+        foreach ($objectLeakCauses as $root => $leakedObjects) {
             $lines = [];
+            $leakedObjectCount = count($leakedObjects);
+            $maybePlural1 = $leakedObjectCount > 1 ? 's' : '';
+            $maybePlural2 = $leakedObjectCount > 1 ? 'they are' : 'it is';
+            $linePrefix = "  The following {$leakedObjectCount} object{$maybePlural1} could not be deallocated";
 
             $lines[] = $root === self::UNKNOWN_ROOT
-                ? "The following {$leakedObjectCount} objects could not be deallocated,\nbut the reason why is unknown:"
-                : "The following {$leakedObjectCount} objects could not be deallocated,\nbecause they are referenced from '{$root}':";
+                ? "{$linePrefix}, but the reason why is unknown:"
+                : "{$linePrefix}, because {$maybePlural2} referenced from '{$root}':";
 
             foreach ($leakedObjects as $objectLabel => $objectReferences) {
-                $lines[] = "  Object '{$objectLabel}' is referenced thought the following path:'";
+                $lines[] = "    Object '{$objectLabel}' is referenced thought the following path:";
 
                 foreach ($objectReferences as $objectReference) {
                     if ($objectReference->source !== null) {
                         $sourceLabel = $this->getSourceObjectLabel($objectReference->source);
-                        $lines[] = "    -> {{$sourceLabel}}";
+                        $lines[] = "       = {{$sourceLabel}}";
                     }
 
                     foreach ($objectReference->path as $segment) {
-                        $lines[] = "    -> {$segment}";
+                        $lines[] = "      -> {$segment}";
                     }
                 }
+
+                $lines[] = "       = {{$objectLabel}}";
+                $lines[] = '';
             }
 
             $blocks[] = implode("\n", $lines);
@@ -123,7 +135,7 @@ final class ObjectDeallocationChecker
         }
 
         $objectId = spl_object_id($object);
-        return 'instance of ' . $object::class . " #{$objectId}";
+        return $object::class . " #{$objectId}";
     }
 
 }
