@@ -216,14 +216,14 @@ final class MemoryScanner
         $mangledObjectProperties = get_mangled_object_vars($object); // same as (array), but ignores cast overloads
         $properties = [];
 
-        foreach ($mangledObjectProperties as $key => $value) {
+        foreach ($mangledObjectProperties as $key => &$value) {
             $nullByteOffset = strrpos($key, "\x00");
 
             $propertyLabel = $nullByteOffset === false
                 ? $key
                 : substr($key, $nullByteOffset + 1);
 
-            $properties['$' . $propertyLabel] = $value;
+            $properties['$' . $propertyLabel] = &$value;
         }
 
         if ($this->isObjectInternal(new ReflectionClass($object))) {
