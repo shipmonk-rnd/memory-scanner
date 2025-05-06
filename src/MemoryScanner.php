@@ -217,11 +217,11 @@ final class MemoryScanner
         $properties = [];
 
         foreach ($mangledObjectProperties as $key => &$value) {
-            $nullByteOffset = strrpos($key, "\x00");
+            $nullByteOffset = strrpos((string) $key, "\x00");
 
             $propertyLabel = $nullByteOffset === false
                 ? $key
-                : substr($key, $nullByteOffset + 1);
+                : substr((string) $key, $nullByteOffset + 1);
 
             $properties['$' . $propertyLabel] = &$value;
         }
