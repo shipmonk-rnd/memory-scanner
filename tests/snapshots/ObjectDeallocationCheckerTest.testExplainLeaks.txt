@@ -5,4 +5,3 @@ Expected all tracked objects to be deallocated, but total of 1 object is still i
       -> static property ShipMonkTests\MemoryScanner\ObjectDeallocationCheckerTest::$leakTest
       -> foo
        = {Foo}
-

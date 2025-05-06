@@ -125,7 +125,7 @@ final class ObjectDeallocationChecker
             $blocks[] = implode("\n", $lines);
         }
 
-        return implode("\n\n", $blocks) . "\n";
+        return implode("\n\n", $blocks);
     }
 
     private function getSourceObjectLabel(object $object): string
