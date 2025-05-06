@@ -26,8 +26,7 @@ use function is_a;
 use function is_array;
 use function is_object;
 use function spl_object_id;
-use function str_replace;
-use function str_starts_with;
+use function strrpos;
 use function substr;
 
 /**
@@ -218,11 +217,13 @@ final class MemoryScanner
         $properties = [];
 
         foreach ($mangledObjectProperties as $key => $value) {
-            $propertyLabel = str_starts_with((string) $key, "\x00")
-                ? str_replace("\x00", '::$', substr((string) $key, 1))
-                : "\${$key}";
+            $nullByteOffset = strrpos($key, "\x00");
 
-            $properties[$propertyLabel] = $value;
+            $propertyLabel = $nullByteOffset === false
+                ? $key
+                : substr($key, $nullByteOffset + 1);
+
+            $properties['$' . $propertyLabel] = $value;
         }
 
         if ($this->isObjectInternal(new ReflectionClass($object))) {
