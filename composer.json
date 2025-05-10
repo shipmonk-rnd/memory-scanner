@@ -5,7 +5,7 @@
         "MIT"
     ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.2"
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.7.0",
@@ -13,11 +13,16 @@
         "phpstan/phpstan": "^2.1.14",
         "phpstan/phpstan-phpunit": "^2.0.6",
         "phpstan/phpstan-strict-rules": "^2.0.4",
-        "phpunit/phpunit": "^10.5.46",
+        "phpunit/phpunit": "^11.5.19",
         "shipmonk/composer-dependency-analyser": "^1.8.2",
         "shipmonk/name-collision-detector": "^2.1.1",
         "shipmonk/phpstan-rules": "^4.1.1",
-        "slevomat/coding-standard": "^8.18"
+        "slevomat/coding-standard": "^8.18",
+        "symfony/dependency-injection": "^7.2",
+        "symfony/framework-bundle": "^7.2",
+        "symfony/http-foundation": "^7.2",
+        "symfony/http-kernel": "^7.2",
+        "symfony/routing": "^7.2"
     },
     "autoload": {
         "psr-4": {
