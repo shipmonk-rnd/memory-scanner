@@ -1,0 +1,7 @@
+Expected all tracked objects to be deallocated, but total of 1 object is still in memory.
+
+  The following 1 object could not be deallocated, because it is referenced from 'static property ShipMonkTests\MemoryScanner\ObjectDeallocationCheckerTest::$leakTest':
+    Object 'Foo' is referenced thought the following path:
+      -> static property ShipMonkTests\MemoryScanner\ObjectDeallocationCheckerTest::$leakTest
+      -> foo
+       = {Foo}
