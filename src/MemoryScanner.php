@@ -8,6 +8,7 @@ use ShipMonk\MemoryScanner\InternalObjectExporter\ClosureExporter;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ReflectionFiberExporter;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ReflectionFunctionExporter;
 use ShipMonk\MemoryScanner\InternalObjectExporter\ReflectionGeneratorExporter;
+use ShipMonk\MemoryScanner\InternalObjectExporter\WeakMapExporter;
 use ShipMonk\MemoryScanner\MemoryRootsProvider\AutoloadMemoryRootsProvider;
 use ShipMonk\MemoryScanner\MemoryRootsProvider\ClassLikeMemoryRootsProvider;
 use ShipMonk\MemoryScanner\MemoryRootsProvider\ConstantMemoryRootsProvider;
@@ -74,6 +75,7 @@ final class MemoryScanner
         $memoryScanner->registerInternalObjectExporter(new ReflectionFiberExporter());
         $memoryScanner->registerInternalObjectExporter(new ReflectionFunctionExporter());
         $memoryScanner->registerInternalObjectExporter(new ReflectionGeneratorExporter());
+        $memoryScanner->registerInternalObjectExporter(new WeakMapExporter());
 
         return $memoryScanner;
     }
