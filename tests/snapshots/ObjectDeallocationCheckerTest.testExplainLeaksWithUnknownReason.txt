@@ -1,0 +1,4 @@
+Expected all tracked objects to be deallocated, but total of 1 object is still in memory.
+
+  The following 1 object could not be deallocated, but this library was unable to figure out why. This could be, because it is referenced from a shutdown handler.
+    - 'A'
