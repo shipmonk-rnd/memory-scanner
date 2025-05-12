@@ -3,10 +3,10 @@
 namespace ShipMonkTests\MemoryScanner\Bridge\PHPUnit;
 
 use ShipMonk\MemoryScanner\Bridge\PHPUnit\ObjectDeallocationCheckerKernelTestCaseTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use function restore_exception_handler;
 
-class ObjectDeallocationCheckerKernelTestCaseTraitTest extends KernelTestCase
+class ObjectDeallocationCheckerKernelTestCaseTraitTest extends WebTestCase
 {
 
     use ObjectDeallocationCheckerKernelTestCaseTrait;
@@ -23,8 +23,10 @@ class ObjectDeallocationCheckerKernelTestCaseTraitTest extends KernelTestCase
 
     public function testUsingContainer(): void
     {
-        self::getContainer()->get('logger');
-        self::assertTrue(true); // @phpstan-ignore staticMethod.alreadyNarrowedType
+        $client = self::createClient();
+        $client->request('GET', '/random/123');
+
+        self::assertResponseIsSuccessful();
     }
 
     protected function tearDown(): void

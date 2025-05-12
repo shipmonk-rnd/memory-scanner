@@ -2,6 +2,7 @@
 
 namespace ShipMonkTests\MemoryScanner\Bridge\PHPUnit;
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,16 +22,11 @@ class TestKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        $container->parameters()
-            ->set('kernel.runtime_mode', ['web' => 0])
-            ->set('kernel.trust_x_sendfile_type_header', false)
-            ->set('kernel.trusted_hosts', ['localhost'])
-            ->set('kernel.trusted_proxies', '0.0.0.0/0')
-            ->set('kernel.trusted_headers', ['X-Forwarded-For', 'X-Forwarded-Proto']);
-
         $container->extension('framework', [
             'test' => true,
         ]);
+
+        $container->services()->set('logger', NullLogger::class);
     }
 
     #[Route('/random/{limit}', name: 'random_number')]
