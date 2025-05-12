@@ -4,6 +4,7 @@ namespace ShipMonkTests\MemoryScanner;
 
 use DateTimeImmutable;
 use ShipMonk\MemoryScanner\ObjectDeallocationChecker;
+use function register_shutdown_function;
 
 class ObjectDeallocationCheckerTest extends MemoryScannerTestCase
 {
@@ -34,6 +35,22 @@ class ObjectDeallocationCheckerTest extends MemoryScannerTestCase
         $leaks = $objectDeallocationChecker->checkDeallocations();
         self::assertCount(1, $leaks);
         self::assertSnapshot(__DIR__ . '/snapshots/ObjectDeallocationCheckerTest.testExplainLeaks.txt', $objectDeallocationChecker->explainLeaks($leaks));
+        self::$leakTest = null;
+    }
+
+    public function testExplainLeaksWithUnknownReason(): void
+    {
+        $a = new DateTimeImmutable();
+        register_shutdown_function(static function () use ($a): void {
+            unset($a);
+        });
+
+        $objectDeallocationChecker = new ObjectDeallocationChecker();
+        $objectDeallocationChecker->expectDeallocation($a, 'A');
+        unset($a);
+
+        $leaks = $objectDeallocationChecker->checkDeallocations();
+        self::assertSnapshot(__DIR__ . '/snapshots/ObjectDeallocationCheckerTest.testExplainLeaksWithUnknownReason.txt', $objectDeallocationChecker->explainLeaks($leaks));
     }
 
 }

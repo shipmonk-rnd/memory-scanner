@@ -100,26 +100,35 @@ final class ObjectDeallocationChecker
             $maybePlural2 = $leakedObjectCount > 1 ? 'they are' : 'it is';
             $linePrefix = "  The following {$leakedObjectCount} object{$maybePlural1} could not be deallocated";
 
-            $lines[] = $root === self::UNKNOWN_ROOT
-                ? "{$linePrefix}, but the reason why is unknown:"
-                : "{$linePrefix}, because {$maybePlural2} referenced from '{$root}':";
+            if ($root === self::UNKNOWN_ROOT) {
+                $lines[] = "{$linePrefix}, but this library was unable to figure out why. This could be, because it is referenced from a shutdown handler.";
 
-            foreach ($leakedObjects as $objectLabel => $objectReferences) {
-                $lines[] = "    Object '{$objectLabel}' is referenced thought the following path:";
-
-                foreach ($objectReferences as $objectReference) {
-                    if ($objectReference->source !== null) {
-                        $sourceLabel = $this->getSourceObjectLabel($objectReference->source);
-                        $lines[] = "       = {{$sourceLabel}}";
-                    }
-
-                    foreach ($objectReference->path as $segment) {
-                        $lines[] = "      -> {$segment}";
-                    }
+                foreach ($leakedObjects as $objectLabel => $objectReferences) {
+                    $lines[] = "    - '{$objectLabel}'";
                 }
 
-                $lines[] = "       = {{$objectLabel}}";
                 $lines[] = '';
+
+            } else {
+                $lines[] = "{$linePrefix}, because {$maybePlural2} referenced from '{$root}':";
+
+                foreach ($leakedObjects as $objectLabel => $objectReferences) {
+                    $lines[] = "    Object '{$objectLabel}' is referenced thought the following path:";
+
+                    foreach ($objectReferences as $objectReference) {
+                        if ($objectReference->source !== null) {
+                            $sourceLabel = $this->getSourceObjectLabel($objectReference->source);
+                            $lines[] = "       = {{$sourceLabel}}";
+                        }
+
+                        foreach ($objectReference->path as $segment) {
+                            $lines[] = "      -> {$segment}";
+                        }
+                    }
+
+                    $lines[] = "       = {{$objectLabel}}";
+                    $lines[] = '';
+                }
             }
 
             $blocks[] = implode("\n", $lines);
