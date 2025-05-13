@@ -54,6 +54,12 @@ if (count($memoryLeaks) > 0) {
 ```
 
 
+## Known Limitations
+
+* it's not possible to get list of registered shutdown handlers, so any leak caused by them will be unexplained
+* xdebug in 'develop' mode sometimes leaks memory for unknown reasons, but notably 'debug' mode is fine
+
+
 ## Installation:
 
 ```sh
