@@ -33,10 +33,10 @@ abstract class MemoryScannerTestCase extends TestCase
     {
         try {
             $cb();
-            self::assertThat(null, new ExceptionConstraint($type)); // @phpstan-ignore new.internalClass
+            self::assertThat(null, new ExceptionConstraint($type));
 
         } catch (Throwable $e) {
-            self::assertThat($e, new ExceptionConstraint($type)); // @phpstan-ignore new.internalClass
+            self::assertThat($e, new ExceptionConstraint($type));
 
             if ($message !== null) {
                 self::assertStringMatchesFormat($message, $e->getMessage());
