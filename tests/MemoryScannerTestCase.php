@@ -18,19 +18,25 @@ abstract class MemoryScannerTestCase extends TestCase
 {
 
     /**
-     * @template T of Throwable
      * @param class-string<T> $type
      * @param callable(): mixed $cb
+     *
+     * @template T of Throwable
+     *
      * @param-immediately-invoked-callable $cb
      */
-    protected static function assertException(string $type, ?string $message, callable $cb): void
+    protected static function assertException(
+        string $type,
+        ?string $message,
+        callable $cb,
+    ): void
     {
         try {
             $cb();
-            self::assertThat(null, new ExceptionConstraint($type)); // @phpstan-ignore new.internalClass
+            self::assertThat(null, new ExceptionConstraint($type));
 
         } catch (Throwable $e) {
-            self::assertThat($e, new ExceptionConstraint($type)); // @phpstan-ignore new.internalClass
+            self::assertThat($e, new ExceptionConstraint($type));
 
             if ($message !== null) {
                 self::assertStringMatchesFormat($message, $e->getMessage());
@@ -38,7 +44,10 @@ abstract class MemoryScannerTestCase extends TestCase
         }
     }
 
-    protected static function assertSnapshot(string $snapshotPath, string $actual): void
+    protected static function assertSnapshot(
+        string $snapshotPath,
+        string $actual,
+    ): void
     {
         if (is_file($snapshotPath) && getenv('UPDATE_SNAPSHOTS') === false) {
             $expected = file_get_contents($snapshotPath);

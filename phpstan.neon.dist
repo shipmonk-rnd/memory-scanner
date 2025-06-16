@@ -20,5 +20,8 @@ parameters:
         forbidCast:
             enabled: false
 
+    featureToggles:
+        internalTag: false
+
     ignoreErrors:
         - message: '#@no-named-arguments#'

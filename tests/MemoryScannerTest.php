@@ -75,7 +75,7 @@ class MemoryScannerTest extends MemoryScannerTestCase
     public function testFindObjectReferencesWithArrayReferenceCycle(): void
     {
         $a = new DateTimeImmutable();
-        $b = [&$b, 'ref' => $a]; // @phpstan-ignore variable.undefined
+        $b = [0 => &$b, 'ref' => $a]; // @phpstan-ignore variable.undefined
         $c = (object) ['ref' => $b];
 
         $memoryScanner = new MemoryScanner();
