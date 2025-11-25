@@ -15,7 +15,7 @@
         "phpstan/phpstan-strict-rules": "^2.0.4",
         "phpunit/phpunit": "^11.5.19",
         "psr/log": "^3.0",
-        "shipmonk/coding-standard": "^0.1.2",
+        "shipmonk/coding-standard": "^0.2.0",
         "shipmonk/composer-dependency-analyser": "^1.8.2",
         "shipmonk/name-collision-detector": "^2.1.1",
         "shipmonk/phpstan-rules": "^4.1.1",
