@@ -10,7 +10,7 @@
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.7.0",
         "ergebnis/composer-normalize": "^2.47.0",
-        "phpstan/phpstan": "^2.1.14",
+        "phpstan/phpstan": "^2.1.32",
         "phpstan/phpstan-phpunit": "^2.0.6",
         "phpstan/phpstan-strict-rules": "^2.0.4",
         "phpunit/phpunit": "^11.5.19",
