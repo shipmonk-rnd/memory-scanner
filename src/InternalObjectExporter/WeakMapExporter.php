@@ -6,7 +6,7 @@ use ShipMonk\MemoryScanner\InternalObjectExporter;
 use WeakMap;
 
 /**
- * @implements InternalObjectExporter<WeakMap<object, mixed>>
+ * @implements InternalObjectExporter<WeakMap<object, *>>
  */
 final class WeakMapExporter implements InternalObjectExporter
 {

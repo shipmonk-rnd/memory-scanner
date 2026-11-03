@@ -9,7 +9,6 @@
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.7.0",
-        "ergebnis/composer-normalize": "^2.47.0",
         "phpstan/phpstan": "^2.1.32",
         "phpstan/phpstan-phpunit": "^2.0.6",
         "phpstan/phpstan-strict-rules": "^2.0.4",
@@ -17,6 +16,7 @@
         "psr/log": "^3.0",
         "shipmonk/coding-standard": "^0.2.0",
         "shipmonk/composer-dependency-analyser": "^1.8.2",
+        "shipmonk/composer-normalizer": "^0.1.0",
         "shipmonk/name-collision-detector": "^2.1.1",
         "shipmonk/phpstan-rules": "^4.1.1",
         "symfony/browser-kit": "^7.2 || ^8.0",
@@ -38,8 +38,7 @@
     },
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "ergebnis/composer-normalize": true
+            "dealerdirect/phpcodesniffer-composer-installer": true
         },
         "sort-packages": true
     },
@@ -53,7 +52,7 @@
             "@check:dependencies"
         ],
         "check:composer": [
-            "composer normalize --dry-run --no-check-lock --no-update-lock",
+            "composer-normalizer --dry-run",
             "composer validate --strict"
         ],
         "check:cs": "phpcs",
@@ -61,6 +60,11 @@
         "check:ec": "ec src tests",
         "check:tests": "phpunit tests",
         "check:types": "phpstan analyse -vv",
+        "fix": [
+            "@fix:composer",
+            "@fix:cs"
+        ],
+        "fix:composer": "composer-normalizer",
         "fix:cs": "phpcbf"
     }
 }
